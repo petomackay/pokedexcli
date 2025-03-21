@@ -23,7 +23,12 @@ func TestCleanInput(t *testing.T) {
             input: "  wHy  are  You    tYping Like THIS???  ",
             expected: []string{"why", "are", "you", "typing", "like", "this???"},
         },
+        {
+		input:    "  ",
+		expected: []string{},
+	},
     }
+
 
     for _,c := range cases {
         actual := cleanInput(c.input)
