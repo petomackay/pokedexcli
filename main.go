@@ -5,9 +5,22 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/petomackay/pokedexcli/internal/pokeclient"
 )
 
+type config struct {
+    prev string
+    next string
+    pokeclient pokeclient.Client
+}
+
 func main() {
+    conf := config{
+        pokeclient: pokeclient.NewClient(5 * time.Second),
+    }
+    
     scanner := bufio.NewScanner(os.Stdin)
     for {
         fmt.Print("Pokedex > ")
@@ -20,7 +33,7 @@ func main() {
 
         cmd := cleanInput[0]
         if cmd, exists := getCommands()[cmd]; exists {
-            err := cmd.callback()
+            err := cmd.callback(&conf)
             if err != nil {
                 fmt.Print(err)
             }
