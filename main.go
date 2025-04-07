@@ -18,7 +18,7 @@ type config struct {
 
 func main() {
     conf := config{
-        pokeclient: pokeclient.NewClient(5 * time.Second),
+        pokeclient: pokeclient.NewClient(time.Second * 5, time.Minute * 5),
     }
     
     scanner := bufio.NewScanner(os.Stdin)

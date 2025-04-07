@@ -19,20 +19,28 @@ type Locations struct {
 
 func (c *Client) GetLocationArea(url string) (Locations, error) {
 	if url == "" {
-		url = "https://pokeapi.co/api/v2/location-area/"
+		url = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 	}
-	res, err := c.httpClient.Get(url)
-	if err != nil {
-		return Locations{}, err
-	}
-	defer res.Body.Close()
 
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return Locations{}, err
+	var data []byte;
+        if value, cached := c.cache.Get(url); cached {
+		data = value
+	} else {
+                res, err := c.httpClient.Get(url)
+        	if err != nil {
+        		return Locations{}, err
+        	}
+        	defer res.Body.Close()
+        
+        	data, err = io.ReadAll(res.Body)
+        	if err != nil {
+        		return Locations{}, err
+        	}
+		c.cache.Add(url, data)
 	}
+
         locations  := Locations{}
-	err = json.Unmarshal(data, &locations)
+	err := json.Unmarshal(data, &locations)
 	if err != nil {
 		fmt.Println("Shajt: ", err)
 	}
