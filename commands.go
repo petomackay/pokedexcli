@@ -1,8 +1,9 @@
 package main
 
 import (
-    "fmt"
-    "os"
+	"errors"
+	"fmt"
+	"os"
 )
 
 
@@ -31,16 +32,21 @@ func getCommands() map[string]cliCommand {
             description: "Displays the names of 20 locations in the Pokemon world.",
             callback:    commandMapB,
         },
+        "explore": {
+            name:       "explore",
+            description: "Lists all the pokemon located in the given area.",
+            callback:   commandExplore,
+        },
     }
 }
 
 type cliCommand struct {
     name string
     description string
-    callback func(*config) error
+    callback func(*config, ...string) error
 }
 
-func commandMap(conf *config) error {
+func commandMap(conf *config, args ...string) error {
     if conf == nil {
         return fmt.Errorf("Conf was nil")
     }
@@ -58,7 +64,7 @@ func commandMap(conf *config) error {
     return nil
 }
 
-func commandMapB(conf *config) error {
+func commandMapB(conf *config, args ...string) error {
     if conf == nil {
         return fmt.Errorf("Conf was null")
     }
@@ -83,13 +89,38 @@ func commandMapB(conf *config) error {
     return nil
 }
 
-func commandExit(conf *config) error {
+func commandExplore(conf *config, args ...string) error {
+    if conf == nil {
+        return fmt.Errorf("Conf was null")
+    }
+
+    if len(args) != 1 {
+        return errors.New("you must provide a location name")
+    }
+
+    areaName := args[0]
+
+    pokemans, err := conf.pokeclient.GetLocationPokemon(areaName)
+    if err != nil {
+        return err
+    }
+    fmt.Println("Exploring " + areaName)
+
+    fmt.Println("Found Pokemon:")
+    for _, pokeman := range pokemans {
+        fmt.Println(" - " + pokeman.Name)
+    } 
+
+    return nil
+}
+
+func commandExit(conf *config, args ...string) error {
     fmt.Println("Closing the Pokedex... Goodbye!")
     os.Exit(0)
     return nil
 }
 
-func commandHelp(conf *config) error {
+func commandHelp(conf *config, args ...string) error {
     fmt.Println("Welcome to the Pokedex!")
     fmt.Println("Usage:")
     fmt.Println()

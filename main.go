@@ -32,8 +32,12 @@ func main() {
         }
 
         cmd := cleanInput[0]
+        args := []string{}
+        if len(cleanInput) > 1 {
+            args = cleanInput[1:]
+        }
         if cmd, exists := getCommands()[cmd]; exists {
-            err := cmd.callback(&conf)
+            err := cmd.callback(&conf, args...)
             if err != nil {
                 fmt.Print(err)
             }
