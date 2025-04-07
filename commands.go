@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/rand"
 	"errors"
 	"fmt"
 	"os"
@@ -33,9 +34,14 @@ func getCommands() map[string]cliCommand {
             callback:    commandMapB,
         },
         "explore": {
-            name:       "explore",
+            name:        "explore",
             description: "Lists all the pokemon located in the given area.",
-            callback:   commandExplore,
+            callback:    commandExplore,
+        },
+        "catch": {
+            name:        "catch",
+            description: "Tries to catch the given pokemon.",
+            callback:    commandCatch,
         },
     }
 }
@@ -114,6 +120,30 @@ func commandExplore(conf *config, args ...string) error {
     return nil
 }
 
+func commandCatch(conf *config, args ...string) error {
+    if conf == nil {
+        return errors.New("conf was null")
+    }
+
+    if len(args) != 1 {
+        return errors.New("you must provide a pokemon name")
+    }
+
+    pokemonName := args[0]
+
+    //TODO: call the API for pokemon info
+
+    fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
+    if tryToCatch() {
+        fmt.Println(pokemonName + " was caught!")
+        //addToPokedex()
+    } else {
+        fmt.Println(pokemonName + " escaped!")
+    }
+    
+    return nil
+}
+
 func commandExit(conf *config, args ...string) error {
     fmt.Println("Closing the Pokedex... Goodbye!")
     os.Exit(0)
@@ -129,4 +159,8 @@ func commandHelp(conf *config, args ...string) error {
     } 
     fmt.Println()
     return nil
+}
+
+func tryToCatch() bool {
+    return rand.Intn(100) < 50
 }
