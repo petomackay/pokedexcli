@@ -132,11 +132,15 @@ func commandCatch(conf *config, args ...string) error {
     pokemonName := args[0]
 
     //TODO: call the API for pokemon info
+    pokemon, err := conf.pokeclient.GetPokemon(pokemonName)
+    if err != nil {
+        return err
+    }
 
     fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
-    if tryToCatch() {
+    if tryToCatch(pokemon.Base_XP) {
         fmt.Println(pokemonName + " was caught!")
-        //addToPokedex()
+        conf.pokedex[pokemonName] = pokemon
     } else {
         fmt.Println(pokemonName + " escaped!")
     }
@@ -161,6 +165,6 @@ func commandHelp(conf *config, args ...string) error {
     return nil
 }
 
-func tryToCatch() bool {
-    return rand.Intn(100) < 50
+func tryToCatch(base_xp int) bool {
+    return rand.Intn(base_xp * 2) < 90
 }

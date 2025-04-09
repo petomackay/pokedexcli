@@ -14,11 +14,13 @@ type config struct {
     prev string
     next string
     pokeclient pokeclient.Client
+    pokedex map[string]pokeclient.Pokemon
 }
 
 func main() {
     conf := config{
         pokeclient: pokeclient.NewClient(time.Second * 5, time.Minute * 5),
+        pokedex:    make(map[string]pokeclient.Pokemon),
     }
     
     scanner := bufio.NewScanner(os.Stdin)
