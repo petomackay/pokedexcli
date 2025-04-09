@@ -1,10 +1,12 @@
 package main
 
 import (
-	"math/rand"
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
+
+	"github.com/petomackay/pokedexcli/internal/pokeclient"
 )
 
 
@@ -42,6 +44,11 @@ func getCommands() map[string]cliCommand {
             name:        "catch",
             description: "Tries to catch the given pokemon.",
             callback:    commandCatch,
+        },
+        "inspect": {
+            name:        "inspect",
+            description: "Show the stats for the pokemon.",
+            callback:    commandInspect,
         },
     }
 }
@@ -140,11 +147,27 @@ func commandCatch(conf *config, args ...string) error {
     fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
     if tryToCatch(pokemon.Base_XP) {
         fmt.Println(pokemonName + " was caught!")
+        fmt.Println("You may now inspect it with the inspect command.")
         conf.pokedex[pokemonName] = pokemon
     } else {
         fmt.Println(pokemonName + " escaped!")
     }
     
+    return nil
+}
+
+func commandInspect(conf *config, args ...string) error {
+    if len(args) != 1 {
+        return errors.New("you must provide a pokemon name")
+    }
+    name := args[0]
+
+    pokeman, found := conf.pokedex[name]
+    if !found {
+        fmt.Printf("You haven't caught %s yet.\n", name)
+        return nil
+    }
+    printPokemonDetails(pokeman)
     return nil
 }
 
@@ -167,4 +190,24 @@ func commandHelp(conf *config, args ...string) error {
 
 func tryToCatch(base_xp int) bool {
     return rand.Intn(base_xp * 2) < 90
+}
+
+func printPokemonDetails(pokemon pokeclient.Pokemon) {
+    fmt.Printf("Name: %s\nHeight: %d\nWeight:%d\n", pokemon.Name, 0, 0)
+    fmt.Println("Abilities:")
+    for _, a := range pokemon.Abilities {
+        fmt.Printf("  - %s\n", a.Ability.Name)
+    }
+    fmt.Println("Moves:")
+    for _, m:= range pokemon.Moves {
+        fmt.Printf("  - %s\n", m.Move.Name)
+    }
+    fmt.Println("Stats:")
+    for _, s := range pokemon.Stats {
+        fmt.Printf("  - %s: %d\n", s.Stat.Name, s.Value)
+    }
+    fmt.Println("Types:")
+    for _, t := range pokemon.Types {
+        fmt.Printf("  - %s\n", t.Type.Name)
+    }
 }

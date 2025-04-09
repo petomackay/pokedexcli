@@ -33,6 +33,34 @@ type PokemonEncounter struct {
 type Pokemon struct {
 	Name string `json:"name"`
 	Base_XP int `json:"base_experience"`
+	Height int  `json:"height"`
+	Weight int  `json:"weight"`
+	
+	Abilities []struct{
+		Ability struct {
+			Name string `json:"name"`
+		} `json:"ability"`
+	} `json:"abilities"`
+	
+	Moves []struct{
+		Move struct {
+			Name string `json:"name"`
+		} `json:"move"`
+	} `json:"moves"`
+
+	Stats []struct{
+		Value int `json:"base_stat"`
+		Stat struct {
+			Name string `json:"name"`
+		} `json:"stat"`
+	} `json:"stats"`
+
+	Types []struct{
+		Type struct{
+			Name string `json:"name"`
+		} `json:"type"`
+	} `json:"types"`
+
 }
 
 func (c *Client) GetLocationArea(url string) (Locations, error) {
